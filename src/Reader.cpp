@@ -16,7 +16,7 @@ std::vector<char> Reader::readBytes(const char* path) {
 	return res;
 }
 
-bool Reader::readMetadata(std::vector<char> &data) {
+bool Reader::readMetadata(const std::vector<char> &data) {
 	// Lees magic number uit data
 	uint32_t magic = readMagic(data);
 	bool isImage = false;
@@ -51,7 +51,33 @@ bool Reader::readMetadata(std::vector<char> &data) {
 	return isImage;
 }
 
-uint32_t Reader::make32bit(char b0, char b1, char b2, char b3) {
+std::vector<char> Reader::readImageBytes(const std::vector<char> &bytes, int idx) {
+	std::vector<char> res;
+	// Lees de grootte uit dataset (28x28 px)
+	int size = Reader::make32bit(bytes[8], bytes[9], bytes[10], bytes[11]) *
+		   Reader::make32bit(bytes[12], bytes[13], bytes[14], bytes[15]);
+	for (int i = 0; i < size; i++) {
+		// Header is 16 bytes, voor de rest zit alle data achter elkaar
+		res.push_back(bytes[16 + size * idx + i]);
+	}
+	return res;
+}
+
+short Reader::readLabel(const std::vector<char> &bytes, int idx) {
+	// Header is 8 bytes
+	return bytes[8 + idx];
+}
+
+Image Reader::readImage(const std::vector<char> &imageBytes, const std::vector<char> &labelBytes, int idx) {
+	// Maak een lege Image struct aan
+	Image i = {};
+	// Lees de data uit de dataset
+	i.bytes = readImageBytes(imageBytes, idx);
+	i.digit = readLabel(labelBytes, idx);
+	return i;
+}
+
+uint32_t Reader::make32bit(const char b0, const char b1, const char b2, const char b3) {
 	// Maakt een unsigned 4-byte (32-bit) integer van 4 verschillende bytes
 	// Voorbeeld:
 	// make32bit(0b1000, 0b0100, 0b0010, 0b0001) -> 0b1000 0100 0010 0001 

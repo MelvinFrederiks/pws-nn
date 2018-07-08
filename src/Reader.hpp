@@ -10,16 +10,24 @@
 #include <sstream>	// stringstream	
 #include <stdexcept>	// runtime_error
 
+#include "Image.hpp"	// Image
+
 // Klasse voor het lezen en interpreteren van de dataset
 class Reader {
 public:
 	// Lees alleen de bytes uit een bestand zonder er enige operaties op uit te voeren
 	static std::vector<char> readBytes(const char* path);
 	// Lees de metadata uit gelezen bytes (aannemend dat de data in het formaat is als gespecificeerd op http://yann.lecun.com/exdb/mnist)
-	static bool readMetadata(std::vector<char> &data);
+	static bool readMetadata(const std::vector<char> &data);
+	// Lees bytes uit de image data voor de gegeven index
+	static std::vector<char> readImageBytes(const std::vector<char> &bytes, int idx);
+	// Lees byte uit de label data voor de gegeven index
+	static short readLabel(const std::vector<char> &bytes, int idx);
+	// Lees image bytes en bijbehorende label en returnt het in een Image struct
+	static Image readImage(const std::vector<char> &imageBytes, const std::vector<char> &labelBytes, int idx);
 private:
-	// Zet 4 1-byte (8-bit) integer om in 1 4-byte (32-bit) integer
-	static uint32_t make32bit(char b0, char b1, char b2, char b3);
+	// Zet 4 1-byte (8-bit) integers om in 1 4-byte (32-bit) integer
+	static uint32_t make32bit(const char b0, const char b1, const char b2, const char b3);
 	// Lees het magic number uit gelezen bytes (aannemend dat de data in het formaat is als gespecificeerd op http://yann.lecun.com/exdb/mnist)
 	static uint32_t readMagic(const std::vector<char> &data);
 };

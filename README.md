@@ -6,7 +6,7 @@
 
 ### Vereisten
 
-Voor het uitvoeren van het programma zijn geen 3rd-party libraries nodig. Om het programma op je eigen machine van source te builden, zij de volgende benodigdheden:
+Voor het uitvoeren van het programma zijn geen 3rd-party libraries nodig. Om het programma op je eigen machine van source te builden, zijn de volgende benodigdheden nodig:
 
 * GNU C++ Compiler (g++)
 * GNU make (make)
@@ -41,7 +41,10 @@ Ga naar de root directory:
 cd pws-nn-master
 ```
 
-en run de Makefile
+Verplaats de bestanden `train-images-idx3-ubyte` en `train-labels-idx1-ubyte` van de [dataset](http://yann.lecun.com/exdb/mnist/) naar de ./data directory
+
+
+Run de Makefile
 
 ```
 make main

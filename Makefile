@@ -2,7 +2,10 @@
 # -Wextra: 	zet extra warnings aan
 # -Werror: 	zorg dat warnings worden behandeld als errors (d.w.z. programma kan niet worden gecompiled als er warnings/errors zijn)
 # -O3: 		optimizatie level 3 (zorget er onder andere voor dat de data sneller kan worden gelezen)
-CFLAGS = -Wall -Wextra -Werror -O3
+CFLAGS = -std=c++11 -Wall -Wextra -Werror -O3
+
+# Include directories
+INCLUDE = -Ieigen
 
 # Naam van executable
 EXE = main
@@ -35,7 +38,7 @@ clean:
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 	# g++ -Wall -Wextra -Werror -O3 -o src1.cpp -o src1.o
 	# Compilet een .cpp bestand in een .o bestand met de flags gespecificeerd in $(CFLAGS)
-	$(CXX) $(CFLAGS) -c $< -o $@
+	$(CXX) $(INCLUDE) $(CFLAGS) -c $< -o $@
 
 # $(CXX) en $(RM) zijn ingebouwde variabelen:
 # $(CXX): C++ compiler (g++/c++)

@@ -10,6 +10,8 @@ public:
 	std::vector<char> bytes;
 	// Label
 	short digit;
+
+	void draw(int width);
 };
 
 #endif

@@ -3,6 +3,7 @@
 #include <stdexcept>	// runtime_error
 
 #include "Reader.hpp"	// Reader
+#include "Layer.hpp"
 
 int main() {
 	try {
@@ -10,20 +11,20 @@ int main() {
 		Reader::readMetadata(imageBytes);
 		std::vector<char> labelBytes = Reader::readBytes("data/train-labels-idx1-ubyte");
 		Reader::readMetadata(labelBytes);
-		for (unsigned int c = 0; c < 10; c++) {
-			Image img = Reader::readImage(imageBytes, labelBytes, c);
-			for (unsigned int i = 0; i < img.bytes.size(); i++) {
-				char b = img.bytes[i];
-				if (b != 0)
-					std::cout << "█";
-				else
-					std::cout << " ";
-				if (i % 28 == 0) {
-					std::cout << std::endl;
-				}
-			}
-			std::cout << "\nLabel: " << img.digit << std::endl;
+
+		Image img = Reader::readImage(imageBytes, labelBytes, 420);
+		img.draw(28);
+		std::vector<float> acts(img.bytes.begin(), img.bytes.end());
+		for (unsigned int i = 0; i < acts.size(); i++) {
+			acts[i] /= 255.f;
 		}
+		Layer input(28 * 28, nullptr);
+		Layer hidden(64, &input);
+		Layer output(10, &hidden);
+		input.activations = Eigen::Map<Eigen::VectorXf>(acts.data(), acts.size());
+		hidden.calculateActivations();
+		output.calculateActivations();
+		std::cout << output.activations << std::endl;
 	} catch (std::runtime_error& e) {
 		std::cerr << "Runtime error:\n\t" << e.what() << std::endl;
 		return 1;

@@ -13,4 +13,5 @@ void Image::draw(int width) {
 			std::cout << std::endl;
 		}
 	}
+	std::cout << std::endl;
 }

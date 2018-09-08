@@ -34,7 +34,7 @@ int main() {
 		Eigen::VectorXf outputError(10);
 		Eigen::VectorXf hiddenError(hidden.activations.size());
 		
-		for (int epoch = 0; epoch < 3; epoch++) {
+		for (int epoch = 0; epoch < 1000; epoch++) {
 			std::cout << "\n\nSTARTING EPOCH " << epoch << std::endl;
 			float mse = 0;
 			int correct = 0;
@@ -43,7 +43,7 @@ int main() {
 			for (int i = 0; i < ITERATIONS; i++) {
 				// Forward pass
 				std::cout << "\rSTARTING ITERATION " << i;
-				img = Reader::readImage(imageBytes, labelBytes, 0);
+				img = Reader::readImage(imageBytes, labelBytes, i);
 				acts = std::vector<float>(img.bytes.begin(), img.bytes.end());
 				for (unsigned int i = 0; i < acts.size(); i++) {
 					acts[i] /= 255.f;

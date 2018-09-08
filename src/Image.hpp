@@ -10,7 +10,8 @@ public:
 	std::vector<char> bytes;
 	// Label
 	short digit;
-
+	
+	// Print een representatie van Image struct
 	void draw(int width);
 };
 

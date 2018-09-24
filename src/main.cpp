@@ -11,9 +11,11 @@
 #include "Layer.hpp"
 #include "Utils.hpp"
 
+#include <fstream>
 
-#define ITERATIONS 60000
-#define RATE 3.0f
+
+#define ITERATIONS 50000
+#define RATE 0.46875f
 
 int main() {
 	try {
@@ -21,6 +23,9 @@ int main() {
 		Reader::readMetadata(imageBytes);
 		std::vector<char> labelBytes = Reader::readBytes("data/train-labels-idx1-ubyte");
 		Reader::readMetadata(labelBytes);
+
+		std::ofstream csvFile;
+		csvFile.open("testData_rateFixed.txt");
 
 		srand(time(NULL));
 		std::minstd_rand generator(std::time(0));
@@ -34,15 +39,15 @@ int main() {
 		Eigen::VectorXf outputError(10);
 		Eigen::VectorXf hiddenError(hidden.activations.size());
 		
-		for (int epoch = 0; epoch < 1000; epoch++) {
-			std::cout << "\n\nSTARTING EPOCH " << epoch << std::endl;
+		for (int epoch = 0; epoch < 100; epoch++) {
+			std::cout << "\n\nSTARTING EPOCH " << epoch + 1 << std::endl;
 			float mse = 0;
 			int correct = 0;
 		
 			std::cout << std::endl;
 			for (int i = 0; i < ITERATIONS; i++) {
 				// Forward pass
-				std::cout << "\rSTARTING ITERATION " << i;
+				std::cout << "\rSTARTING ITERATION " << i + 1;
 				img = Reader::readImage(imageBytes, labelBytes, i);
 				acts = std::vector<float>(img.bytes.begin(), img.bytes.end());
 				for (unsigned int i = 0; i < acts.size(); i++) {
@@ -87,8 +92,26 @@ int main() {
 			}
 			mse /= 2 * ITERATIONS;
 			std::cout << "\nMSE of this epoch: " << mse << std::endl;
-			std::cout << "Epoch score: " << correct << "/60000" << std::endl;
+			std::cout << "Epoch score: " << correct << "/" << ITERATIONS << std::endl;
+			csvFile << epoch << "," << mse << "\n";
 		}
+		csvFile.close();
+		Image unknownImg;
+		int unknownCorrect = 0;
+		std::vector<float> unknownActs;
+		for (int i = 50000; i < 60000; i++) {
+			unknownImg = Reader::readImage(imageBytes, labelBytes, i);
+			unknownActs = std::vector<float>(unknownImg.bytes.begin(), unknownImg.bytes.end());
+			for (unsigned int i = 0; i < acts.size(); i++) {
+				unknownActs[i] /= 255.f;
+			}
+			input.activations = Eigen::Map<Eigen::VectorXf>(unknownActs.data(), unknownActs.size());
+			hidden.calculateActivations();
+			output.calculateActivations();
+			if (Utils::getResult(output.activations) == Utils::getDesiredVector(unknownImg.digit))
+				unknownCorrect++;
+		}
+		std::cout << "Correct: " << unknownCorrect << std::endl;
 	} catch (std::runtime_error& e) {
 		std::cerr << "Runtime error:\n\t" << e.what() << std::endl;
 		return 1;
